@@ -7,6 +7,7 @@
 </head>
 <body>
 
+
     <h2>Formulário Cliente</h2>
 
     <form action="teste.php" method="post">

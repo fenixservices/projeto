@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 16/02/2024 às 02:59
+-- Tempo de geração: 05/03/2024 às 01:57
 -- Versão do servidor: 8.0.35
 -- Versão do PHP: 8.2.12
 
@@ -29,21 +29,38 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `clientes` (
   `id` int NOT NULL,
-  `codigo_cliente` varchar(50) NOT NULL,
-  `nome_cliente` varchar(255) NOT NULL,
-  `endereco_cliente` varchar(255) NOT NULL,
-  `bairro_cliente` varchar(255) NOT NULL,
-  `tipo_cliente` varchar(50) NOT NULL
+  `nome` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `endereco` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `cidade` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `bairro` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `telefone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `tipo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Despejando dados para a tabela `clientes`
 --
 
-INSERT INTO `clientes` (`id`, `codigo_cliente`, `nome_cliente`, `endereco_cliente`, `bairro_cliente`, `tipo_cliente`) VALUES
-(1, '1', 'madalena', 'rua jose ', 'pacaembu', 'residencial'),
-(2, '2', 'eribaldo', 'rua sakai', 'paca', 'residencial'),
-(3, '3', 'vladimir', 'rua eder', 'jose bonifacio', 'residencial');
+INSERT INTO `clientes` (`id`, `nome`, `email`, `endereco`, `cidade`, `bairro`, `telefone`, `tipo`) VALUES
+(89, 'Rafael', 'rafaaaaaa2015@gmail.com', 'Rua junto', 'São Paulo', 'sadfasd', '1456789', 'residencial'),
+(90, 'Ricardo', 'fenix@cgo.com', 'rua santos', 'São Paulo', 'Itaim Paulista', '11 956458264', 'comercial'),
+(111, 'Rafael 2', 'rafael@gmail.com', 'Rua junto', 'as', 'violeta', '11964596879', 'residencial'),
+(112, 'gustavo', 'gustavo@gmail.com', 'rua rio bras', 'sao paulo', 'jardins', '11656569794', 'comercial');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `registro`
+--
+
+CREATE TABLE `registro` (
+  `id` int NOT NULL,
+  `nome` varchar(100) NOT NULL,
+  `data` date NOT NULL,
+  `hora` time NOT NULL,
+  `ocorrencia` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -52,8 +69,7 @@ INSERT INTO `clientes` (`id`, `codigo_cliente`, `nome_cliente`, `endereco_client
 --
 
 CREATE TABLE `servicos` (
-  `id` int NOT NULL,
-  `codigo_servico` varchar(50) NOT NULL,
+  `codigo_servico` int NOT NULL,
   `nome_servico` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -61,10 +77,11 @@ CREATE TABLE `servicos` (
 -- Despejando dados para a tabela `servicos`
 --
 
-INSERT INTO `servicos` (`id`, `codigo_servico`, `nome_servico`) VALUES
-(1, '1', 'envio de imagem'),
-(2, '2', 'ativacao pgm'),
-(3, '3', 'disparo de alarme');
+INSERT INTO `servicos` (`codigo_servico`, `nome_servico`) VALUES
+(1, 'envio de imagem'),
+(2, 'ativacao pgm'),
+(3, 'disparo de alarme'),
+(21, 'saida assistida');
 
 -- --------------------------------------------------------
 
@@ -102,10 +119,16 @@ ALTER TABLE `clientes`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Índices de tabela `registro`
+--
+ALTER TABLE `registro`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices de tabela `servicos`
 --
 ALTER TABLE `servicos`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`codigo_servico`);
 
 --
 -- Índices de tabela `usuario`
@@ -121,13 +144,19 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de tabela `clientes`
 --
 ALTER TABLE `clientes`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+
+--
+-- AUTO_INCREMENT de tabela `registro`
+--
+ALTER TABLE `registro`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `servicos`
 --
 ALTER TABLE `servicos`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `codigo_servico` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de tabela `usuario`

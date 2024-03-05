@@ -160,11 +160,17 @@ option {
 
     }
 
+    form#formulario{
+        margin-top: 60px;
+    }
+
+
     form {
         background-color: #cfd5e1;
         padding: 40px;
         border-radius: 10px;
         background-color: #fa4b00;
+        margin-top: -60px;
     }
 
     select,

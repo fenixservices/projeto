@@ -46,19 +46,22 @@ function mostrarFormularioCadastro() {
     var labelClientes = document.querySelector("label[for='clientes']");
     var h2Clientes = document.querySelector("#clientesselect h2");
     var clienteForm = document.getElementById("clienteForm");
+    var formulario = document.getElementById("formulario")
 
     if (formularioCadastro.style.display === "none") {
         formularioCadastro.style.display = "block";
         selectClientes.style.display = "none"; // Esconder apenas o formulário de seleção de clientes
         labelClientes.style.display = "none"; // Esconder o label
-        h2Clientes.style.display = "none"; // Esconder o h2
+        //h2Clientes.style.display = "none"; // Esconder o h2
         clienteForm.style.display = "none";
+        formulario.style.display = "none";
     } else {
         formularioCadastro.style.display = "none";
         selectClientes.style.display = "block"; // Mostrar apenas o formulário de seleção de clientes
         labelClientes.style.display = "block"; // Mostrar o label
-        h2Clientes.style.display = "block"; // Mostrar o h2
+       // h2Clientes.style.display = "block"; // Mostrar o h2
         clienteForm.style.display = "block";
+        formulario.style.display = "block";
     }
 }
 
@@ -98,7 +101,7 @@ function limparForm() {
 
 function mostrarFormularioCliente() {
     var formularioCliente = document.getElementById("formulario");
-    formularioCliente.style.display = "block";
+    
 }
 
 document.getElementById("clientes").addEventListener("change", function () {

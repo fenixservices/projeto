@@ -19,30 +19,14 @@ $queryUsuarios = "SELECT id, nome FROM usuario";
 $resultUsuarios = mysqli_query($conexao, $queryUsuarios);
 $listaUsuarios = mysqli_fetch_all($resultUsuarios, MYSQLI_ASSOC);
 
-if (isset($_POST['submit'])) {
-    // print_r('Nome: ' . $_POST['nome']);
-    // print_r('<br>');
-    // print_r('Email: ' . $_POST['email']);
-    // print_r('<br>');
-    // print_r('Telefone: ' . $_POST['telefone']);
-    // print_r('<br>');
-    // print_r('Sexo: ' . $_POST['genero']);
-    // print_r('<br>');
-    // print_r('Data de nascimento: ' . $_POST['data_nascimento']);
-    // print_r('<br>');
-    // print_r('Cidade: ' . $_POST['cidade']);
-    // print_r('<br>');
-    // print_r('Estado: ' . $_POST['estado']);
-    // print_r('<br>');
-    // print_r('Endereço: ' . $_POST['endereco']);
-
-    $nome = $_POST['nome'];
-    $email = $_POST['email'];
-    $endereco = $_POST['endereco'];
-    $cidade = $_POST['cidade'];
-    $bairro = $_POST['bairro'];
-    $telefone = $_POST['telefone'];
-    $tipo = $_POST['tipo'];
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_cliente'])) {
+    $nome = isset($_POST['nome']) ? $_POST['nome'] : '';
+    $email = isset($_POST['email']) ? $_POST['email'] : '';
+    $endereco = isset($_POST['endereco']) ? $_POST['endereco'] : '';
+    $cidade = isset($_POST['cidade']) ? $_POST['cidade'] : '';
+    $bairro = isset($_POST['bairro']) ? $_POST['bairro'] : '';
+    $telefone = isset($_POST['telefone']) ? $_POST['telefone'] : '';
+    $tipo = isset($_POST['tipo']) ? $_POST['tipo'] : '';
 
 
     $result = mysqli_query($conexao, "INSERT INTO clientes(nome,email,endereco,cidade,bairro,telefone,tipo) 
@@ -57,10 +41,25 @@ if (isset($_POST['submit'])) {
         echo "<script>setTimeout(function() { document.getElementById('mensagem-erro').style.display = 'none'; }, 3000);</script>";
         echo "<h1 id='mensagem-erro'>Erro ao enviar os dados. Por favor, tente novamente.</h1>";
     }
-
-
 }
+?>
 
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_servico'])) {
+    // Capturando os dados do formulário
+    $nome_servico = isset($_POST['nome_servico']) ? $_POST['nome_servico'] : '';
+
+    // Preparando e executando a consulta SQL para inserir os dados na tabela 'servicos'
+    $sql = "INSERT INTO servicos (nome_servico) VALUES ('$nome_servico')";
+
+    if (mysqli_query($conexao, $sql)) {
+        echo "<script>setTimeout(function() { document.getElementById('mensagem-sucesso').style.display = 'none'; }, 3000);</script>";
+        echo "<h1 id='mensagem-sucesso'>Dados enviados com sucesso.</h1>";
+    } else {
+        echo "<script>setTimeout(function() { document.getElementById('mensagem-erro').style.display = 'none'; }, 3000);</script>";
+        echo "<h1 id='mensagem-erro'>Erro ao enviar os dados. Por favor, tente novamente.</h1>" . mysqli_error($conexao);
+    }
+}
 ?>
 
 
@@ -88,6 +87,10 @@ if (isset($_POST['submit'])) {
         margin-left: auto;
         margin-right: auto;
     }
+
+    label.hora {
+        color: white;
+    }
 </style>
 
 <body>
@@ -103,8 +106,8 @@ if (isset($_POST['submit'])) {
                             class="ph ph-list-plus"></i></a></li>
                 <li><a href="#" id="clientesMenu" onclick="mostrarClientes()">Clientes<i
                             class="ph ph-user-list"></i></a></li>
-                <li><a href="#" id="ocorrenciasMenu" onclick="mostrarOcorrencia()">Ocorrências<i
-                            class="ph ph-read-cv-logo"></i></a></li>
+                <!--<li><a href="#" id="ocorrenciasMenu" onclick="mostrarOcorrencia()">Ocorrências<i
+                            class="ph ph-read-cv-logo"></i></a></li>-->
                 <li><a href="#" id="usuariosMenu" onclick="mostrarUsuario()">Usuários<i class="ph ph-users"></i></a>
                 </li>
             </ul>
@@ -143,37 +146,84 @@ if (isset($_POST['submit'])) {
         </form>
     </div>
 
+
+
+<!-- logo abaixo é o menu de registro, os dados do banco de dados estão aparecendo normalmente,
+basta fazer a ligação com o banco de dados e fazer com que todas as informações como usuário, data, hora
+e ocorrência seja enviado para o banco de dados-->
+
+
+
     <!-- Formulário oculto que será mostrado quando a opção registro for selecionado -->
     <div class="container-registro" id="registroContainer" style="display: none;">
 
-        <form id="registroForm" onsubmit="return false;">
+        <form action="dashboard.php" id="registroForm">
             <h2>Registro</h2><br>
             <select id="clientes-registro">
                 <option value="">Selecione...</option>
                 <?php
                 // Consulta SQL para obter os nomes dos clientes da tabela clientes
-                $queryClientes = "SELECT id, nome FROM clientes";
-                $resultClientes = mysqli_query($conexao, $queryClientes);
+                $queryUsuario = "SELECT id, nome FROM usuario";
+                $resultUsuario = mysqli_query($conexao, $queryUsuario);
 
                 // Verifica se a consulta foi bem-sucedida
-                if ($resultClientes) {
+                if ($resultUsuario && mysqli_num_rows($resultUsuario) > 0) {
                     // Loop através dos resultados para preencher as opções do menu suspenso
-                    while ($row = mysqli_fetch_assoc($resultClientes)) {
-                        $clienteId = $row['id'];
-                        $clienteNome = $row['nome'];
-                        echo "<option value='$clienteId'>$clienteNome</option>";
+                    while ($row = mysqli_fetch_assoc($resultUsuario)) {
+                        $usuarioId = $row['id'];
+                        $usuarioNome = $row['nome'];
+                        echo "<option value='$usuarioId'>$usuarioNome</option>";
                     }
                 } else {
                     echo "<option value=''>Erro ao carregar clientes</option>";
                 }
                 ?>
             </select>
-            <input type="text" id="campo2" name="campo2" placeholder="Campo 2" required>
+            <input type="date" value="<?php echo date("Y-m-d"); ?>">
+            <div class="horario">
+                <?php
+                $timezone = new DateTimeZone('America/Sao_Paulo');
+                $agora = new DateTime('now', $timezone);
+                echo '<label class="hora">Hora Atual: ' . $agora->format('H:i') . '</label>';
+                ?>
+            </div>
+
+            <select id="registro-ocorrencias">
+                <option value="">Selecione...</option>
+                <?php
+                // Consulta SQL para obter os nomes dos clientes da tabela clientes
+                $queryServicos = "SELECT nome_servico FROM servicos";
+                $resultServicos = mysqli_query($conexao, $queryServicos);
+
+                // Verifica se a consulta foi bem-sucedida
+                if ($resultServicos && mysqli_num_rows($resultServicos) > 0) {
+                    // Loop através dos resultados para preencher as opções do menu suspenso
+                    while ($row = mysqli_fetch_assoc($resultServicos)) {
+                        //$ServicosId = $row['id'];
+                        $ServicosNome = $row['nome_servico'];
+                        echo "<option value=''>$ServicosNome</option>";
+                    }
+                } else {
+                    echo "<option value=''>Erro ao carregar clientes</option>";
+                }
+                ?>
+            </select>
+
             <!-- Adicionar mais campos conforme necessário -->
             <button class="btn" onclick="salvarRegistro()">Salvar</button>
             <button class="btn" onclick="limparForm()">Limpar</button>
         </form>
+
+        <form action="dashboard.php" method="post">
+            <input type="text" id="nome_servico" name="nome_servico" placeholder="Cadastre uma nova opção" required><br>
+            <input type="submit" name="submit_servico" id="submit">
+        </form>
+
     </div>
+
+
+    <!--logo abaixo está o menu de clientes, nele é necessario resolver o erro da página estar recarregando 
+    toda vez que envia os dados, mas funcionalidade está ok-->
 
     <div class="container-clientes" id="clientesContainer" style="display: none;">
 
@@ -194,15 +244,15 @@ if (isset($_POST['submit'])) {
                     <option value="residencial">Residencial</option>
                     <option value="comercial">Comercial</option>
                 </select><br>
-                <input type="submit" name="submit" id="submit">
+                <input type="submit" name="submit_cliente" id="submit">
             </form>
         </div>
 
         <h2>Formulário Cliente</h2>
 
-        <form action="dashboard.php" method="post">
+        <form action="dashboard.php" method="post" id="formulario" onchange="mostrarFormularioCliente()">
             <label for="clientes">Selecione um Cliente:</label>
-            <select name="clientes" id="clientes" onchange="mostrarFormularioCliente()">
+            <select name="clientes" id="clientes">
 
 
                 <?php
@@ -233,10 +283,12 @@ if (isset($_POST['submit'])) {
                     echo "<option value=''>Nenhum cliente encontrado</option>";
                 }
                 $conn->close();
-                ?>
+                ?><br>
+
+                <input type="submit" value="Selecionar">
             </select>
             <br><br>
-            <input type="submit" value="Selecionar">
+
 
             <h2>Formulário Cliente</h2>
 
@@ -265,19 +317,21 @@ if (isset($_POST['submit'])) {
                 if ($result->num_rows > 0) {
                     // Exibir os dados do cliente no formulário
                     $row = $result->fetch_assoc();
-                    echo "<form>";
+                    echo "<form id='formulario'>";
+                    echo "<label for='nome'>Código do cliente:</label>";
+                    echo "<input type='text' id='id' name='id' value='" . $row['id'] . "'>";
                     echo "<label for='nome'>Nome:</label>";
-                    echo "<input type='text' id='nome' name='nome' value='" . $row['nome'] . "'><br><br>";
+                    echo "<input type='text' id='nome' name='nome' value='" . $row['nome'] . "'>";
                     echo "<label for='email'>Email:</label>";
-                    echo "<input type='text' id='email' name='email' value='" . $row['email'] . "'><br><br>";
+                    echo "<input type='text' id='email' name='email' value='" . $row['email'] . "'>";
                     echo "<label for='endereco'>Endereço:</label>";
-                    echo "<input type='text' id='endereco' name='endereco' value='" . $row['endereco'] . "'><br><br>";
+                    echo "<input type='text' id='endereco' name='endereco' value='" . $row['endereco'] . "'>";
                     echo "<label for='cidade'>Cidade:</label>";
-                    echo "<input type='text' id='cidade' name='cidade' value='" . $row['cidade'] . "'><br><br>";
+                    echo "<input type='text' id='cidade' name='cidade' value='" . $row['cidade'] . "'>";
                     echo "<label for='bairro'>Bairro:</label>";
-                    echo "<input type='text' id='bairro' name='bairro' value='" . $row['bairro'] . "'><br><br>";
+                    echo "<input type='text' id='bairro' name='bairro' value='" . $row['bairro'] . "'>";
                     echo "<label for='telefone'>Telefone:</label>";
-                    echo "<input type='text' id='telefone' name='telefone' value='" . $row['telefone'] . "'><br><br>";
+                    echo "<input type='text' id='telefone' name='telefone' value='" . $row['telefone'] . "'>";
                     echo "<label for='tipo'>Tipo:</label>";
                     echo "<select name='tipo' id='tipo'>";
                     echo "<option value='residencial' " . ($row['tipo'] == 'residencial' ? 'selected' : '') . ">Residencial</option>";
@@ -288,8 +342,6 @@ if (isset($_POST['submit'])) {
                     echo "Nenhum cliente encontrado.";
                 }
                 $conn->close();
-            } else {
-                echo "Por favor, selecione um cliente.";
             }
             ?>
         </form>
@@ -347,22 +399,40 @@ if (isset($_POST['submit'])) {
             var selectClientes = document.getElementById("clientes");
             var labelClientes = document.querySelector("label[for='clientes']");
             var h2Clientes = document.querySelector("#clientesselect h2");
-            var clienteForm = document.getElementById("clienteForm");
+            //var clienteForm = document.getElementById("clienteForm");
+            var formulario = document.getElementById("formulario")
 
             if (formularioCadastro.style.display === "none") {
                 formularioCadastro.style.display = "block";
                 selectClientes.style.display = "none"; // Esconder apenas o formulário de seleção de clientes
                 labelClientes.style.display = "none"; // Esconder o label
-                h2Clientes.style.display = "none"; // Esconder o h2
-                clienteForm.style.display = "none";
+                //h2Clientes.style.display = "none"; // Esconder o h2
+                //clienteForm.style.display = "none";
+                formulario.style.display = "none";
             } else {
                 formularioCadastro.style.display = "none";
                 selectClientes.style.display = "block"; // Mostrar apenas o formulário de seleção de clientes
                 labelClientes.style.display = "block"; // Mostrar o label
-                h2Clientes.style.display = "block"; // Mostrar o h2
-                clienteForm.style.display = "block";
+                // h2Clientes.style.display = "block"; // Mostrar o h2
+                //clienteForm.style.display = "block";
+                formulario.style.display = "block";
             }
         }
+
+        document.getElementById("clientes").addEventListener("change", function () {
+            var selectElement = document.getElementById("clientes");
+            var formulario = document.getElementById("formulario");
+            var registroForm = document.getElementById("registroForm");
+            if (selectElement.value === "") {
+                formulario.style.display = "block"; // Oculta o formulário se "Selecione..." for selecionado
+                registroForm.style.display = "block";
+
+            } else {
+                formulario.style.display = "block"; // Exibe o formulário para outras opções selecionadas
+                registroForm.style.display = "none";
+                //selectElement.style.display = "block"; // Esconde a lista de clientes
+            }
+        });
 
         function salvarRegistro() {
             // adicionar a lógica para salvar o registro
@@ -400,21 +470,9 @@ if (isset($_POST['submit'])) {
 
         function mostrarFormularioCliente() {
             var formularioCliente = document.getElementById("formulario");
-            formularioCliente.style.display = "block";
+
         }
 
-        document.getElementById("clientes").addEventListener("change", function () {
-            var selectElement = document.getElementById("clientes");
-            var formulario = document.getElementById("formulario");
-            var registroForm = document.getElementById("registroForm");
-            if (selectElement.value === "") {
-                formulario.style.display = "none"; // Oculta o formulário se "Selecione..." for selecionado
-                registroForm.style.display = "block";
-            } else {
-                formulario.style.display = "block"; // Exibe o formulário para outras opções selecionadas
-                registroForm.style.display = "block";
-            }
-        });
 
         function excluirCliente() {
             //  adicionar a lógica para excluir o cliente
